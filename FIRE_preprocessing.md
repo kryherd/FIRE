@@ -82,7 +82,7 @@ Eyelink data is stored in the folder EyelinkDataAll. For each subject, you shoul
 
 2. Within each trial for each run, click on the "Import Area of Interest" button, and load the corresponding Area of Interest (these AoIs are located in AreasOfInterest folder). Then, click on the trial, scroll down to the `Interest Area Set` field, and select the right interest area. This part is a little tedious! When you are done, save out the file as `<subjectNumber>_IndivEDFs`. Do **not** close the file.
 
-3. Copy the script "extractScannerPulseTime.sh" into the Session_Data folder (which will be located in the <subjectNumber>_IndivEDFs.res folder). Navigate to that folder. Run it with `tcsh extractScannerPulseTime.sh`. (Note: You must be in `tcsh` to do this). This creates the file `scannerStartTimes.txt`, with the scanner onset time next to each run number.
+3. Copy the script `extractScannerPulseTime.sh` into the Session_Data folder (which will be located in the <subjectNumber>_IndivEDFs.res folder). Navigate to that folder. Run it with `tcsh extractScannerPulseTime.sh`. (Note: You must be in `tcsh` to do this). This creates the file `scannerStartTimes.txt`, with the scanner onset time next to each run number.
 
 4. Go back to your EDF files in DataViewer, and click on Analysis -> Trial Variable Manager. Click the little page icon to create a new variable. Under Label, enter `ScannerPulseTime`. Under Default Value, enter 0. Under Definition, enter "Time when scanner started." Select `ScannerPulseTime` in the list and use the arrow button to place it right below `scanrun`. Press OK.
 
@@ -104,14 +104,25 @@ Save as `Onsets_<subjectNumber>.txt` into the `<subjectNumber>_IndivEDFs/<subjec
 
 ## Creating the Timing Files
 
-1. Copy the `WordTimings.txt` and `*.sh` files to the `<subjectNumber>_IndivEDFs/<subjectNumber>_IndivEDFS.res` folder.
-2. Type `tcsh calcOnsets.sh` to create the fMRI_Onsets.txt file. 
-3. Since there are a variable number of TRs per subject, and since there can be a variable number of TRs within each run, the scripts `calcfMRIOnsets.sh` and `calcfMRIOnsets_NGRAM.sh` will need to be modified. Open them up with the text editor of your choice, and open up another terminal and navigate to the subject's fMRI directory. 
-4. Type `3dinfo -nt` followed by the functional run name to extract the number of TRs for that subject.
-5. Note that the TR length is 1.85 seconds.
-6. In the script, replace the string REPLACE with the product of the number of TRs times the TR length. 
-7. Type `bash calcfMRIOnset.sh` to create the timing file `allfMRI_Onsets.txt`. 
-8. Do the same for `calcfMRIOnsets_NGRAM.sh` to create an NGRAM file for the NGRAM analysis. This will take a few minutes.
+First, you will need to create the subject/TR file that the script will read. For each subject that you want to make timing files for, you will need to put their number followed by a space and then the number of TRs in each run.
+
+Type `3dinfo -nt ` and then drag any file from the `fire` folder in a participant's main folder into Terminal.
+
+![](./Images/nt.png)
+
+This will print out the number of TRs in a FIRE run for that subject. Go to the `timing_subjList.txt` file (in the main `Data` folder) and edit it in your favorite text editor. Paste the subject number and the number of TRs separated by a space, like below.
+
+```
+6036 152
+6041 127
+```
+Save this file. Now you will actually create the timing files.
+
+1. Navigate to the top Data directory using Terminal. `PATH_TO_DROBO/FIRE_fMRI/Data/`.
+2. Navigate to the Scripts folder. `cd Scripts`
+3. Type `sh make_timings.sh` to run the script.
+
+Each subject that you make timing files for should now have a folder named `timings` with two files inside. One is for the regular analysis, and one for the NGRAM.
 
 ## Pre-processing
 
